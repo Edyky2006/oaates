@@ -1,5 +1,10 @@
 #include <iostream>
 #include <string>
+#include <sstream>
+#include <algorithm>
+#include <cctype>
+#include <map>
+#include <windows.h>
 
 using namespace std;
 
@@ -13,12 +18,14 @@ private:
         Node* left;
         Node* right;
 
-        Node(long long px, long long py ){
-            x=px;
-            y=py;
-            left=nullptr;
-            right=nullptr;
-        }
+    Node(long long px, long long py ){
+        x=px;
+        y=py;
+        left=nullptr;
+        right=nullptr;
+    }
+
+
     };
 
     Node* root;
@@ -93,12 +100,25 @@ private:
         }
     }
 
+    void clear_rec(Node* node) {
+        if (node != nullptr) {
+            clear_rec(node->left);
+            clear_rec(node->right);
+            delete node;
+        }
+    }
+
 public:
     KDTree(string n){
         name=n;
         root=nullptr;
-        cout << name << "has been created." << endl;
+        cout << name << " has been created." << endl;
     }
+
+    ~KDTree() {
+        clear_rec(root);
+    }
+
     void Insert(long long x, long long y){
         root = insert_rec(root, x, y, 0);
         cout << "Point ("<< x << ", " << y << ") added to " << name << "." << endl;
@@ -133,4 +153,49 @@ public:
         }
     }
 
+};
+
+class Database {
+private:
+    map<string, KDTree*> tables;
+
+public:
+    ~Database() {
+        for (auto const& pair : tables) {
+            delete pair.second;
+        }
+    }
+
+    void Create(string name) {
+        if (tables.count(name) > 0) {
+            cout << "Error: Structure '" << name << "' already exists!\n";
+            return;
+        }
+        tables[name] = new KDTree(name);
+    }
+
+    void Insert(string name, long long x, long long y) {
+        if (tables.count(name) == 0) {
+            cout << "Error: Target structure '" << name << "' does not exist.\n";
+            return;
+        }
+        tables[name]->Insert(x, y);
+    }
+
+    void Contains(string name, long long x, long long y) {
+        if (tables.count(name) == 0) {
+            cout << "Error: Target structure '" << name << "' does not exist.\n";
+            return;
+        }
+        tables[name]->Contains(x, y);
+    }
+
+    void PrintTree(string name){
+        if (tables.count(name)==0){
+            cout << "Error: Target structure " << name << " does not exist.\n";
+            return;
+        }
+
+        tables[name]->PrintTree();
+    }
 };
