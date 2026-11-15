@@ -373,3 +373,48 @@ public:
     tables[name]->SearchNN(x,y);
     }
 };
+
+
+void to_upper_case(string& str) {
+    transform(str.begin(), str.end(), str.begin(), ::toupper);
+}
+
+bool is_valid_identifier(const string& str) {
+    if (str.empty()) return false;
+
+    if (!isalpha(str[0])) {
+        return false;
+    }
+
+    for (size_t i = 1; i < str.length(); ++i) {
+        char c = str[i];
+        if (!isalnum(c) && c != '_') {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool parse_tree_and_point(stringstream& ss, string& name, long long& x, long long& y) {
+    char left_paren, comma, right_paren;
+    if (!(ss >> name >> left_paren >> x >> comma >> y >> right_paren)) {
+        return false;
+    }
+    if (left_paren != '(' || comma != ',' || right_paren != ')') {
+        return false;
+    }
+    return true;
+}
+
+bool parse_point(stringstream& ss, long long& x, long long& y) {
+    char lp, comma, rp;
+    if (!(ss >> lp >> x >> comma >> y >> rp)) return false;
+    return (lp == '(' && comma == ',' && rp == ')');
+}
+
+bool parse_two_points(stringstream& ss, long long& x1, long long& y1, long long& x2, long long& y2) {
+    char lp1, c1, rp1, comma_mid, lp2, c2, rp2;
+    if (!(ss >> lp1 >> x1 >> c1 >> y1 >> rp1 >> comma_mid >> lp2 >> x2 >> c2 >> y2 >> rp2)) return false;
+    return (lp1 == '(' && c1 == ',' && rp1 == ')' && comma_mid == ',' &&
+            lp2 == '(' && c2 == ',' && rp2 == ')');
+}
