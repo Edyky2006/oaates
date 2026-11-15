@@ -418,3 +418,142 @@ bool parse_two_points(stringstream& ss, long long& x1, long long& y1, long long&
     return (lp1 == '(' && c1 == ',' && rp1 == ')' && comma_mid == ',' &&
             lp2 == '(' && c2 == ',' && rp2 == ')');
 }
+
+// =================================
+void run_parser() {
+    Database db;
+    string command_block;
+
+    cout << "KD-Tree Database System. Commands: CREATE, INSERT, CONTAINS, PRINT_TREE, SEARCH(WHERE INSIDE; ABOVE TO; NN)." << endl;
+
+    while (getline(cin, command_block, ';')) {
+
+        string trash;
+        getline(cin, trash, '\n');
+
+        stringstream ss(command_block);
+        string command;
+
+        if (!(ss >> command)) {
+            continue;
+        }
+
+        to_upper_case(command);
+
+        if (command == "CREATE") {
+            string name;
+            if (!(ss >> name)) {
+                cout << "Error: Missing name for new set..\n";
+                continue;
+            }
+
+            if (!is_valid_identifier(name)) {
+                cout << "Error: Invalid format. Must match [a-zA-Z][a-zA-Z0-9_]*\n";
+                continue;
+            }
+
+            db.Create(name);
+        }
+
+        else if (command == "INSERT") {
+            string name;
+            long long x, y;
+            if (!parse_tree_and_point(ss, name, x, y)) {
+                cout << "Error: Incorrect syntax. INSERT requires name and 2 numbers (x, y).\n";
+                continue;
+            }
+            db.Insert(name, x, y);
+        }
+
+        else if (command == "CONTAINS") {
+            string name;
+            long long x, y;
+            if (!parse_tree_and_point(ss, name, x, y)) {
+                cout << "Error: Incorrect syntax. CONTAINS requires name and 2 numbers (x, y).\n";
+                continue;
+            }
+            db.Contains(name, x, y);
+        }
+
+        else if (command == "PRINT_TREE") {
+            string name;
+            if (!(ss >> name)) {
+                cout << "Error: Missing name for PRINT_TREE command.\n";
+                continue;
+            }
+            db.PrintTree(name);
+        }
+
+        else if (command == "SEARCH") {
+            string name;
+            if (!(ss >> name)) {
+                cout << "Error: Missing name for SEARCH command.\n";
+                continue;
+            }
+
+            string next_word;
+            if (ss >> next_word) {
+                to_upper_case(next_word);
+
+                if (next_word == "WHERE") {
+                    string query_type;
+
+                    if (ss >> query_type) {
+                        to_upper_case(query_type);
+
+                        if (query_type == "INSIDE") {
+                            long long x_left, y_bottom, x_right, y_top;
+                            if (!parse_two_points(ss, x_left, y_bottom, x_right, y_top)) {
+                                cout << "Error: Incorrect syntax. Expected: INSIDE (x1,y1), (x2,y2)\n";
+                                continue;
+                            }
+                            db.SearchInside(name, x_left, y_bottom, x_right, y_top);
+                        }
+                        else if (query_type == "ABOVE_TO") {
+                            long long x;
+                            if (!(ss >> x)) {
+                                cout << "Error: Incorrect syntax. Expected: ABOVE_TO x\n";
+                                continue;
+                            }
+                            db.SearchAboveTo(name, x);
+                        }
+                        else if (query_type == "NN") {
+                            long long x, y;
+                            if (!parse_point(ss, x, y)) {
+                                cout << "Error: Incorrect syntax. Expected: NN (x, y)\n";
+                                continue;
+                            }
+                            db.SearchNN(name, x, y);
+                        }
+                        else {
+                            cout << "Error: Unknown query type -> " << query_type << "\n";
+                        }
+                    } else {
+                        cout << "Error: Missing query type (INSIDE, ABOVE_TO, NN) after WHERE.\n";
+                    }
+                } else {
+                    cout << "Error: Expected WHERE keyword, found -> " << next_word << "\n";
+                }
+            }
+            else {
+                db.Search(name);
+            }
+        }
+
+        else if (command == "EXIT") {
+            break;
+        }
+
+        else {
+            cout << "Error: Unknown command syntax -> " << command << "\n";
+        }
+    }
+}
+
+int main() {
+    SetConsoleOutputCP(CP_UTF8);
+
+    run_parser();
+
+    return 0;
+};
