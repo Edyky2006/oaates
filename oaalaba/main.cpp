@@ -188,7 +188,7 @@ private:
                 search_nn_rec(node->right, target_x, target_y, depth + 1, best_nodes, best_dist);
 
                 long long dist_to_wall = (target_x - node->x) * (target_x - node->x);
-                if (dist_to_wall <= best_dist) {
+                if (dist_to_wall < best_dist) {
                     search_nn_rec(node->left, target_x, target_y, depth + 1, best_nodes, best_dist);
                 }
             }
@@ -206,7 +206,7 @@ private:
                 search_nn_rec(node->right, target_x, target_y, depth + 1, best_nodes, best_dist);
 
                 long long dist_to_wall = (target_y - node->y) * (target_y - node->y);
-                if (dist_to_wall <= best_dist) {
+                if (dist_to_wall < best_dist) {
                     search_nn_rec(node->left, target_x, target_y, depth + 1, best_nodes, best_dist);
                 }
             }
@@ -512,7 +512,7 @@ void run_parser() {
                         else if (query_type == "ABOVE_TO") {
                             long long x;
                             if (!(ss >> x)) {
-                                cout << "Error: Incorrect syntax. Expected: ABOVE_TO x\n";
+                                cout << "Error: Incorrect syntax. Expected: ABOVE_TO y\n";
                                 continue;
                             }
                             db.SearchAboveTo(name, x);
@@ -556,4 +556,4 @@ int main() {
     run_parser();
 
     return 0;
-};
+}
